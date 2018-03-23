@@ -3,16 +3,19 @@
 
 -- First install of the app
 -- An user can have multiples 1st install (if he/she has multiple devices)
--- Can an user have multiple installs for the same device?
--- How to know who is the user before login? Fingerprint?
+-- Can an user have multiple installations for the same device? And multiple 1st installations?
+-- How to know who is the user before login? Fingerprint? Or install == access?
 CREATE TABLE IF NOT EXISTS dwh.user_first_install_fact (
     user_id VARCHAR(36), -- Assuming this info is easy to check (cookie or fingerprint)
     install_id VARCHAR(36),
     device_id  VARCHAR(36), -- Unique ID for each unique device
+
     installed_at TIMESTAMP,
-    date_sk INT, -- Only date (YYYY-MM-DD) or datetime?
+
+    date_sk INT, -- References only a date type (YYYY-MM-DD) or datetime type?
     client_sk INT,
     channel_sk INT,
+
     country_code VARCHAR(7),
     network_name VARCHAR(256),
     campaign_name VARCHAR(256),
@@ -31,18 +34,23 @@ CREATE TABLE IF NOT EXISTS dwh.user_first_install_fact (
 -- May not contain "too much" records (and that makes sense)
 CREATE TABLE client_dim (
     client_sk   INTEGER,
+
     os_name     VARCHAR(256), -- if only Redshift had enumeration...
     app_name    VARCHAR(256),
     app_version VARCHAR(256),
     device_name VARCHAR(256), -- if only Redshift had enumeration...
+
     PRIMARY KEY (client_sk)
 );
 
--- What is a channel? If the user was acquired from website itself, Facebook or referral link for example?
+-- What is a channel? If the user was acquired from website itself, Facebook or referral link, for example?
+-- e.g., Facebook is labeled FB and is in group SOCIAL_NETWORKS?
 CREATE TABLE IF NOT EXISTS dwh.channel_dim (
     channel_sk INT,
+
     channel_name TEXT,
     channel_group TEXT,
     channel_label TEXT,
+
     PRIMARY KEY (channel_sk)
 );

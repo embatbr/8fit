@@ -17,10 +17,11 @@
 -- there are at least two installations, but the table "dwh.user_first_install_fact"
 -- receives only 1 record. Therefore, the field "device_id" is not relevant in this case.
 
--- I am assuming the fields "date_sk" references a table "date_dim", that contains year, month and day,
--- and with values matching the year, month and day extracted from field "installed_at". While "installed_at"
--- is almost unique, for some analyses the table "date_dim" is preferable. Here, I will rely on Redshift
--- datetime functions, instead of creating an UDF to determine when a date "is yesterday".
+-- I am assuming the field "date_sk" references a table "date_dim" containing year, month and day,
+-- and with values matching the year, month and day extracted from field "installed_at". While
+-- "installed_at" is almost unique, for some analyses the table "date_dim" is preferable. Here, I
+-- will rely on Redshift datetime functions, instead of creating an UDF to determine when a date
+-- "is yesterday" or use a table that wasn't provided.
 
 
 -- Solution 1:
@@ -31,11 +32,11 @@ FROM (
     SELECT
         user_id,
         client_sk,
-        count(user_id, client_sk) AS amount
+        count(*) AS amount
     FROM
         dwh.user_first_install_fact
     WHERE
-        DATEDIFF(day, TRUNC(installed_at), CURRENT_DATE) = 1
+        datediff(day, trunc(installed_at), CURRENT_DATE) = 1
     GROUP BY
         user_id,
         client_sk
@@ -44,10 +45,10 @@ WHERE
     yesterday_installs.amount > 1;
 
 
--- Solution 2 (entirely not sure - need to check this with my eyes rested):
+-- Solution 2:
 
 SELECT
-    yesterday_installs.user_id
+    yesterday_installs_dup.user_id
 FROM (
     SELECT
         user_id,
@@ -55,10 +56,10 @@ FROM (
     FROM
         dwh.user_first_install_fact
     WHERE
-        DATEDIFF(day, TRUNC(installed_at), CURRENT_DATE) = 1
+        datediff(day, trunc(installed_at), CURRENT_DATE) = 1
     GROUP BY
         user_id,
         client_sk
         HAVING
-            count(user_id, client_sk) > 1
-) yesterday_installs;
+            count(*) > 1
+) yesterday_installs_dup;
