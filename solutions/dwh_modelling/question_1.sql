@@ -27,12 +27,12 @@
 -- Solution 1:
 
 SELECT
-    yesterday_installs.user_id
+    DISTINCT yesterday_installs.user_id
 FROM (
     SELECT
         user_id,
         client_sk,
-        count(*) AS amount
+        count(*) AS amount_first_install
     FROM
         dwh.user_first_install_fact
     WHERE
@@ -42,13 +42,13 @@ FROM (
         client_sk
 ) yesterday_installs
 WHERE
-    yesterday_installs.amount > 1;
+    yesterday_installs.amount_first_install > 1;
 
 
 -- Solution 2:
 
 SELECT
-    yesterday_installs_dup.user_id
+    DISTINCT yesterday_installs_dup.user_id
 FROM (
     SELECT
         user_id,
