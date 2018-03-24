@@ -6,7 +6,7 @@
 -- of (user_id, device_id, client_sk), whenever these 3 columns appear repeated, the
 -- "user 1st install" is repeated in a device. This seems as an impossibility.
 
--- However, if an user installs the same client in two similar devices (e.g., two similar iPhones),
+-- However, if a user installs the same client in two similar devices (e.g., two similar iPhones),
 -- is the device_id different? Since "device" is the unique piece of hardware, two similar iPhones,
 -- of the same version and manufactured together (twins) are different devices. They could be similar
 -- if we're using a dimension table "device_type", but the field is a raw fact.
@@ -20,7 +20,7 @@
 -- I am assuming the field "date_sk" references a table "date_dim" containing year, month and day,
 -- and with values matching the year, month and day extracted from field "installed_at". While
 -- "installed_at" is almost unique, for some analyses the table "date_dim" is preferable. Here, I
--- will rely on Redshift datetime functions, instead of creating an UDF to determine when a date
+-- will rely on Redshift datetime functions, instead of creating a UDF to determine when a date
 -- "is yesterday" or use a table that wasn't provided.
 
 

@@ -2,8 +2,8 @@
 
 
 -- First install of the app
--- An user can have multiples 1st install (if he/she has multiple devices)
--- Can an user have multiple installations for the same device? And multiple 1st installations?
+-- A user can have multiples 1st install (if he/she has multiple devices)
+-- Can a user have multiple installations for the same device? And multiple 1st installations?
 -- How to know who is the user before login? Fingerprint? Or install == access?
 CREATE TABLE IF NOT EXISTS dwh.user_first_install_fact (
     user_id VARCHAR(36), -- Assuming this info is easy to check (cookie or fingerprint)
