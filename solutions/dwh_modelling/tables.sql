@@ -44,7 +44,7 @@ CREATE TABLE client_dim (
 );
 
 -- What is a channel? If the user was acquired from website itself, Facebook or referral link, for example?
--- e.g., Facebook is labeled FB and is in group SOCIAL_NETWORKS?
+-- e.g., Facebook is labeled FB and is in group "social media"?
 CREATE TABLE IF NOT EXISTS dwh.channel_dim (
     channel_sk INT,
 

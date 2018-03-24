@@ -11,7 +11,7 @@
 
 WITH channel_for_android_install AS (
     SELECT
-        u.channel_sk AS channel,
+        u.channel_sk,
         count(*) AS amount
     FROM
         dwh.user_first_install_fact
@@ -21,11 +21,15 @@ WITH channel_for_android_install AS (
             u.client_sk = c.client_sk
             AND c.os_name = 'Android'
     GROUP BY
-        u.channel
+        u.channel_sk
 )
 SELECT
-    w.channel
+    ch.channel_name
 FROM
     channel_for_android_install w
 WHERE
-    dense_rank() OVER (PARTITION BY w.channel ORDER BY w.amount DESC) <= 5;
+    dense_rank() OVER (PARTITION BY w.channel_sk ORDER BY w.amount DESC) <= 5;
+INNER JOIN
+    dwh.channel_dim ch
+    ON
+        w.channel_sk = ch.channel_sk
