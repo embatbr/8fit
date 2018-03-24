@@ -1,14 +1,3 @@
--- Question: Write a query, using Redshift ANSI SQL, to know which are the top 5 channels
--- with the most installs coming in from Android.
-
--- Observation: "most installs" or "most FIRST installs"? I am assuming the "first" was
--- forgotten.
-
-
--- Channels with the same amount must appear in the same position.
--- If two channels have rank 5 and the others ranks have just 1 channel (returning
--- 6 channels), both must appear, not one be cut by chance. Therefore, windowing.
-
 SELECT
     E.channel,
     E.position

@@ -29,7 +29,7 @@ for i in range(random.randint(50, 100)):
     timestamp = random.randint(two_days_ago, now)
 
     client_sk = random.choice([0, 1, 2, 3, 4, 5])
-    channel_sk = random.choice([0, 1, 2, 3, 4, 5])
+    channel_sk = random.choice([0, 1, 2, 3, 4, 5, 6, 7])
 
     value = "('%s', '%s', '%s', to_timestamp(%d), NULL, %d, %d)" % (user_id, install_id,
                                                                     device_id, timestamp,

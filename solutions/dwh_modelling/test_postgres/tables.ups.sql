@@ -54,4 +54,6 @@ VALUES
     (2, 'referral', 'direct link', 'ref'),
     (3, 'direct', 'direct link', 'dir'),
     (4, 'paid user', 'forced', 'paid'),
-    (5, 'fake research', 'forced', 'fake');
+    (5, 'fake research', 'forced', 'fake'),
+    (6, 'telephone line', 'active', 'phone'),
+    (7, 'folder distribution', 'active', 'folder');
