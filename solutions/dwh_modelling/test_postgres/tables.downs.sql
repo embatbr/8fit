@@ -1,0 +1,3 @@
+DROP SCHEMA dwh CASCADE;
+
+DROP TABLE client_dim;
