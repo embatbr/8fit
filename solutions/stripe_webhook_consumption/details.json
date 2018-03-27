@@ -1,0 +1,11 @@
+{
+    "lambda": {
+        "name": "stripe_webhooks_lambda",
+        "role": {
+            "name": "stripe_webhooks_role"
+        }
+    },
+    "api": {
+        "name": "stripe_webhooks_api"
+    }
+}
