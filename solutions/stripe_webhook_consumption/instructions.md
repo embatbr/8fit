@@ -6,9 +6,9 @@ Instructions to build the pipeline manually.
 2. Create an API **stripe_webhooks_api**;
 3. Add a mock GET method for **/** (just for testing purposes):
     - Edit its **Integration Response** to return a non-empty body.
-4. Deploy it in **prod** stage;
+4. Deploy it in **dev** stage;
 5. Back to the Lambda panel, add an API Gateway trigger:
-    - Stage: prod
+    - Stage: dev
     - Security: open
 6. Add a file **event_extractor.py** with the content of the same:
     - Change the handler to **event_extractor.handle**.
