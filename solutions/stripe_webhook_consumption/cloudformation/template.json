@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "REST API.",
+    "Description": "REST API for Stripe's webhooks events.",
     "Resources": {
         "RestApi": {
             "Type": "AWS::ApiGateway::RestApi",
@@ -11,30 +11,8 @@
         "Get": {
             "Type": "AWS::ApiGateway::Method",
             "Properties": {
-                "AuthorizationType": "NONE",
                 "HttpMethod": "GET",
-                "Integration": {
-                    "IntegrationResponses": [
-                        {
-                            "ResponseTemplates": {
-                                "application/json": "Hallo von Brasilien!"
-                            },
-                            "StatusCode": 200
-                        }
-                    ],
-                    "RequestTemplates": {
-                        "application/json": "{\"statusCode\": 200}"
-                    },
-                    "Type": "MOCK"
-                },
-                "MethodResponses": [
-                    {
-                        "ResponseModels": {
-                            "application/json": "Empty"
-                        },
-                        "StatusCode": 200
-                    }
-                ],
+                "AuthorizationType": "NONE",
                 "ResourceId": {
                     "Fn::GetAtt": [
                         "RestApi",
@@ -43,12 +21,35 @@
                 },
                 "RestApiId": {
                     "Ref": "RestApi"
-                }
+                },
+                "Integration": {
+                    "Type": "MOCK",
+                    "RequestTemplates": {
+                        "application/json": "{\"statusCode\": 200}"
+                    },
+                    "IntegrationResponses": [
+                        {
+                            "StatusCode": 200,
+                            "ResponseTemplates": {
+                                "application/json": "Hallo von Brasilien!"
+                            }
+                        }
+                    ]
+                },
+                "MethodResponses": [
+                    {
+                        "StatusCode": 200,
+                        "ResponseModels": {
+                            "application/json": "Empty"
+                        }
+                    }
+                ]
             }
         },
-        "EventsResource": {
+        "EventResource": {
             "Type": "AWS::ApiGateway::Resource",
             "Properties": {
+                "PathPart": "event",
                 "RestApiId": {
                     "Ref": "RestApi"
                 },
@@ -57,19 +58,19 @@
                         "RestApi",
                         "RootResourceId"
                     ]
-                },
-                "PathPart": "events"
+                }
             }
         },
-        "EventsFunction": {
+        "EventFunction": {
             "Type" : "AWS::Lambda::Function",
             "Properties": {
+                "FunctionName": "stripe_webhooks_lambda",
+                "Handler": "event_extractor.handle",
+                "Runtime": "python3.6",
                 "Code": {
                     "S3Bucket": "stripe-8fit",
                     "S3Key": "stripe_webhooks_lambda.zip"
                 },
-                "FunctionName": "stripe_webhooks_lambda",
-                "Handler": "event_extractor.handle",
                 "Role": {
                     "Fn::Join": [
                         "",
@@ -82,39 +83,89 @@
                         ]
                     ]
                 },
-                "Runtime": "python3.6",
                 "Timeout": "30"
             }
         },
-        "EventsGet": {
-            "Type": "AWS::ApiGateway::Method",
+        "LambdaPermission": {
+            "Type": "AWS::Lambda::Permission",
             "Properties": {
+                "Action": "lambda:invokeFunction",
+                "FunctionName": {
+                    "Fn::GetAtt": [
+                        "EventFunction",
+                        "Arn"
+                    ]
+                },
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "arn:aws:execute-api:",
+                            {
+                                "Ref": "AWS::Region"
+                            },
+                            ":",
+                            {
+                                "Ref": "AWS::AccountId"
+                            },
+                            ":",
+                            {
+                                "Ref": "RestApi"
+                            },
+                            "/*"
+                        ]
+                    ]
+                }
+            }
+        },
+        "EventPost": {
+            "Type": "AWS::ApiGateway::Method",
+            "DependsOn": "LambdaPermission",
+            "Properties": {
+                "HttpMethod": "POST",
                 "AuthorizationType": "NONE",
-                "HttpMethod": "GET",
                 "Integration": {
+                    "IntegrationHttpMethod": "POST",
+                    "Type": "AWS",
                     "IntegrationResponses": [
                         {
+                            "StatusCode": 200,
                             "ResponseTemplates": {
-                                "application/json": "{\"foo\": \"bar\"}"
-                            },
-                            "StatusCode": 200
+                                "application/json": "$input.json('$')"
+                            }
                         }
                     ],
-                    "RequestTemplates": {
-                        "application/json": "{\"statusCode\": 200}"
+                    "Uri": {
+                        "Fn::Join" : [
+                            "",
+                            [
+                                "arn:aws:apigateway:",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                ":lambda:path/2015-03-31/functions/",
+                                {
+                                    "Fn::GetAtt": [
+                                        "EventFunction",
+                                        "Arn"
+                                    ]
+                                },
+                            "/invocations"
+                            ]
+                        ]
                     },
-                    "Type": "MOCK"
                 },
                 "MethodResponses": [
                     {
+                        "StatusCode": 200,
                         "ResponseModels": {
                             "application/json": "Empty"
-                        },
-                        "StatusCode": 200
+                        }
                     }
                 ],
                 "ResourceId": {
-                    "Ref": "EventsResource"
+                    "Ref": "EventResource"
                 },
                 "RestApiId": {
                     "Ref": "RestApi"
@@ -130,7 +181,8 @@
                 "StageName": "dev"
             },
             "DependsOn": [
-                "Get"
+                "Get",
+                "EventPost"
             ]
         }
     }

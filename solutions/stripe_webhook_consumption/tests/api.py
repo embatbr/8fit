@@ -20,8 +20,8 @@ print(resp.text)
 my_path = os.path.dirname(os.path.abspath(__file__))
 events = json.load(open('%s/events.json' % my_path))
 
-print("\nTesting POST for '/events'.")
-url = '{}/events'.format(base_url)
+print("\nTesting POST for '/event'.")
+url = '{}/event'.format(base_url)
 for event in events:
     resp = r.post(url, json=event)
     print(resp.status_code)
