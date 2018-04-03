@@ -21,4 +21,4 @@ echo "Creating..."
 aws cloudformation create-stack \
     --stack-name apigateway \
     --template-body file://./template.json \
-    --capabilities CAPABILITY_IAM
+    --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
