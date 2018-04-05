@@ -95,6 +95,40 @@
                 ]
             }
         },
+        "StepFunctionsRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": ["lambda.amazonaws.com"]
+                            },
+                            "Action": ["sts:AssumeRole"]
+                        }
+                    ]
+                },
+                "RoleName": "api_gateway_to_step_functions",
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyName": "AWSLambdaFullAccess",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": ["logs:*"],
+                                    "Resource": "arn:aws:logs:*:*:*"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
         "EventFunction": {
             "Type" : "AWS::Lambda::Function",
             "Properties": {
